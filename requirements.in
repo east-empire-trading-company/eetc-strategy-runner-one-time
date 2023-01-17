@@ -1,0 +1,10 @@
+arch
+black
+eetc-data-client
+eetc-utils
+fastapi
+numpy
+pandas
+python-telegram-bot
+requests
+uvicorn

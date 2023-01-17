@@ -1,0 +1,48 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: eetc-strategy-runner-one-time
+  labels:
+    cloud.googleapis.com/location: us-east1
+  annotations:
+    client.knative.dev/user-image: gcr.io/eetc-strategy-runner-one-time/eetc-strategy-runner-one-time-service
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+spec:
+  template:
+    metadata:
+      annotations:
+        client.knative.dev/user-image: gcr.io/eetc-strategy-runner-one-time/eetc-strategy-runner-one-time-service
+        autoscaling.knative.dev/maxScale: '1'
+        autoscaling.knative.dev/minScale: '0'
+    spec:
+      containerConcurrency: 60
+      timeoutSeconds: 3600
+      containers:
+      - image: gcr.io/eetc-strategy-runner-one-time/eetc-strategy-runner-one-time-service
+        ports:
+        - name: http1
+          containerPort: 8080
+        env:
+        - name: TELEGRAM_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: TELEGRAM_BOT_TOKEN
+        - name: TELEGRAM_CHANNEL_ID
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: TELEGRAM_CHANNEL_ID
+        - name: EETC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: EETC_API_KEY
+        resources:
+          limits:
+            cpu: '2'
+            memory: 8Gi
+  traffic:
+  - percent: 100
+    latestRevision: true
