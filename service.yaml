@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: eetc-strategy-runner-one-time
+  name: eetc-strategy-runner-one-time-service
   labels:
     cloud.googleapis.com/location: us-east1
   annotations:
@@ -13,7 +13,7 @@ spec:
     metadata:
       annotations:
         client.knative.dev/user-image: gcr.io/eetc-strategy-runner-one-time/eetc-strategy-runner-one-time-service
-        autoscaling.knative.dev/maxScale: '1'
+        autoscaling.knative.dev/maxScale: '2'
         autoscaling.knative.dev/minScale: '0'
     spec:
       containerConcurrency: 60
@@ -39,6 +39,16 @@ spec:
             secretKeyRef:
               key: latest
               name: EETC_API_KEY
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: AWS_ACCESS_KEY
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: AWS_SECRET_ACCESS_KEY
         resources:
           limits:
             cpu: '2'
