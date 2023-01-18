@@ -1,10 +1,13 @@
 arch
 black
+boto3
 eetc-data-client
 eetc-utils
 fastapi
 numpy
 pandas
+pytest
+pytest-cov
 python-telegram-bot
 requests
-uvicorn
+uvicorn[standard]
