@@ -1,3 +1,4 @@
+# TODO extract Telegram message sending to separate microservice
 import telegram as tg
 
 import settings

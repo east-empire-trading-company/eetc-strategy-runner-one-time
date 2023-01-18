@@ -50,21 +50,6 @@ class OneTimeStrategy(StrategyBase):
         # TODO create ZMQ context if not provided
         self._zmq_context = zmq_context if zmq_context else None
 
-    def execute(self):
-        """
-        Execute the self._algorithm() method defined by the developer.
-        """
-
-        self._algorithm()
-
-    async def execute_async(self):
-        """
-        Execute the self._algorithm() method defined by the developer in case
-        it has async code in it that needs to be awaited.
-        """
-
-        await self._algorithm()
-
     def _algorithm(self):
         raise NotImplementedError()
 

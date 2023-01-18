@@ -6,10 +6,9 @@ from strategies.calculate_optimal_position_size import CalculateOptimalPositionS
 app = FastAPI()
 
 
-@app.get("/calculate_optimal_position_sizes")
+@app.get("/api/strategy/calculate_optimal_position_sizes")
 async def execute_calculate_optimal_position_sizes_strategy():
-    context = Context()
-    context.add_strategy(CalculateOptimalPositionSize)
+    context = Context(strategies=[CalculateOptimalPositionSize])
 
     await context.execute_strategies_async()
 

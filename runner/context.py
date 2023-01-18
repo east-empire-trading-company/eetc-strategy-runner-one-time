@@ -1,9 +1,11 @@
+import logging
 from typing import List, Type
 
 from eetc_data_client.client import EETCDataClient
 
 import settings
 from runner.strategy import StrategyBase
+from utils.email import EmailClient
 from utils.telegram import EETCTelegramChannel
 from utils.vault import EETCVaultClient
 
@@ -18,6 +20,11 @@ class Context:
         self._telegram_channel = EETCTelegramChannel()
         self._data_client = EETCDataClient(api_key=settings.EETC_API_KEY)
         self._vault_client = EETCVaultClient()
+        self._email_client = EmailClient()
+
+    @property
+    def email_client(self) -> EmailClient:
+        return self._email_client
 
     @property
     def strategies(self) -> List[StrategyBase]:
@@ -51,6 +58,7 @@ class Context:
         """
 
         for strategy in self._strategies:
+            logging.info(f"Executing strategy: {strategy.__class__}")
             strategy.execute()
 
     async def execute_strategies_async(self):
@@ -59,4 +67,5 @@ class Context:
         """
 
         for strategy in self._strategies:
+            logging.info(f"Executing strategy: {strategy.__class__}")
             await strategy.execute_async()

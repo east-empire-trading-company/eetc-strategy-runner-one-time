@@ -10,8 +10,8 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
         Then send out alerts for those whose position size is more than 5%
         different from the optimal size.
 
-        We have to make this async due to the Telegram runner code which needs to
-        be awaited.
+        We have to make this async due to the Telegram runner code which needs
+        to be awaited.
         """
 
         default_position_size = 10000
@@ -49,9 +49,11 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
                 f"{symbol} - Current Position Size is {current_position_size}, "
                 f"but Optimal Position Size should be {optimal_position_size}"
             )
-            self.parent_context.optimal_position_sizes = {
-                symbol: optimal_position_size,
-            }
 
-            # TODO extract to microservice so we don't have to use async await
+            # TODO automatically rebalance position instead of sending alerts
+            self.parent_context.email_client.send_email(
+                subject=f"{symbol} - Position Size Recommendation",
+                body_html=message,
+                recipients=["eastempiretradingcompany2019@gmail.com"],
+            )
             await self.parent_context.telegram_channel.broadcast_message(message)
