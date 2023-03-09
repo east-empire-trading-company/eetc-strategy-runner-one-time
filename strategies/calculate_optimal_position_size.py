@@ -56,4 +56,4 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
                 body_html=message,
                 recipients=["eastempiretradingcompany2019@gmail.com"],
             )
-            await self.parent_context.telegram_channel.broadcast_message(message)
+            await self.parent_context.telegram_channel.send_message(message)
