@@ -31,7 +31,7 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
                 price_data,
                 position["start_date"],
                 position["position_type"],
-                use_fractional_kelly=False,
+                use_fractional_kelly=True,
                 use_garch=True,
             )
             optimal_position_size = round(optimal_leverage * default_position_size, 2)
