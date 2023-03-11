@@ -31,7 +31,7 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
                 price_data,
                 position["start_date"],
                 position["position_type"],
-                use_fractional_kelly=False,
+                use_fractional_kelly=True,
                 use_garch=True,
             )
             optimal_position_size = round(optimal_leverage * default_position_size, 2)
@@ -56,4 +56,4 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
                 body_html=message,
                 recipients=["eastempiretradingcompany2019@gmail.com"],
             )
-            await self.parent_context.telegram_channel.broadcast_message(message)
+            await self.parent_context.telegram_channel.send_message(message)

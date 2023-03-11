@@ -7,6 +7,7 @@ reformat_code:
 install_python_requirements:
 	pip install pip-tools
 	pip install -r requirements.txt
+	pip install --upgrade dist/ibapi-10.19.1-py3-none-any.whl
 
 update_python_requirements:
 	pip install pip-tools

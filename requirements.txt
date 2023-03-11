@@ -13,11 +13,11 @@ arch==5.3.1
     # via -r requirements.in
 attrs==22.2.0
     # via pytest
-black==22.12.0
+black==23.1.0
     # via -r requirements.in
-boto3==1.26.51
+boto3==1.26.88
     # via -r requirements.in
-botocore==1.29.51
+botocore==1.29.88
     # via
     #   boto3
     #   s3transfer
@@ -26,32 +26,38 @@ certifi==2022.12.7
     #   httpcore
     #   httpx
     #   requests
-charset-normalizer==3.0.1
+charset-normalizer==3.1.0
     # via requests
 click==8.1.3
     # via
     #   black
     #   uvicorn
-coverage[toml]==7.0.5
+coverage[toml]==7.2.1
     # via pytest-cov
-eetc-data-client==1.0.0
+eetc-data-client==2.0.0
     # via -r requirements.in
 eetc-utils==1.0.2
     # via -r requirements.in
 exceptiongroup==1.1.0
     # via pytest
-fastapi==0.89.1
+fastapi==0.93.0
     # via -r requirements.in
 h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+h2==4.1.0
+    # via httpx
+hpack==4.0.0
+    # via h2
 httpcore==0.16.3
     # via httpx
 httptools==0.5.0
     # via uvicorn
-httpx==0.23.3
+httpx[http2]==0.23.3
     # via python-telegram-bot
+hyperframe==6.0.1
+    # via h2
 idna==3.4
     # via
     #   anyio
@@ -63,9 +69,11 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-mypy-extensions==0.4.3
+kaleido==0.2.1
+    # via -r requirements.in
+mypy-extensions==1.0.0
     # via black
-numpy==1.24.1
+numpy==1.24.2
     # via
     #   -r requirements.in
     #   arch
@@ -75,26 +83,29 @@ numpy==1.24.1
     #   statsmodels
 packaging==23.0
     # via
+    #   black
     #   pytest
     #   statsmodels
-pandas==1.5.2
+pandas==1.5.3
     # via
     #   -r requirements.in
     #   arch
     #   statsmodels
-pathspec==0.10.3
+pathspec==0.11.0
     # via black
 patsy==0.5.3
     # via statsmodels
-platformdirs==2.6.2
+platformdirs==3.1.0
     # via black
+plotly==5.13.1
+    # via -r requirements.in
 pluggy==1.0.0
     # via pytest
 property-cached==1.6.4
     # via arch
-pydantic==1.10.4
+pydantic==1.10.6
     # via fastapi
-pytest==7.2.1
+pytest==7.2.2
     # via
     #   -r requirements.in
     #   pytest-cov
@@ -104,9 +115,9 @@ python-dateutil==2.8.2
     # via
     #   botocore
     #   pandas
-python-dotenv==0.21.0
+python-dotenv==1.0.0
     # via uvicorn
-python-telegram-bot==20.0
+python-telegram-bot==20.1
     # via -r requirements.in
 pytz==2022.7.1
     # via pandas
@@ -118,7 +129,7 @@ rfc3986[idna2008]==1.5.0
     # via httpx
 s3transfer==0.6.0
     # via boto3
-scipy==1.10.0
+scipy==1.10.1
     # via
     #   arch
     #   statsmodels
@@ -131,22 +142,24 @@ sniffio==1.3.0
     #   anyio
     #   httpcore
     #   httpx
-starlette==0.22.0
+starlette==0.25.0
     # via fastapi
 statsmodels==0.13.5
     # via arch
+tenacity==8.2.2
+    # via plotly
 tomli==2.0.1
     # via
     #   black
     #   coverage
     #   pytest
-typing-extensions==4.4.0
+typing-extensions==4.5.0
     # via pydantic
 urllib3==1.26.14
     # via
     #   botocore
     #   requests
-uvicorn[standard]==0.20.0
+uvicorn[standard]==0.21.0
     # via -r requirements.in
 uvloop==0.17.0
     # via uvicorn
