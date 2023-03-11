@@ -15,9 +15,9 @@ attrs==22.2.0
     # via pytest
 black==23.1.0
     # via -r requirements.in
-boto3==1.26.87
+boto3==1.26.88
     # via -r requirements.in
-botocore==1.29.87
+botocore==1.29.88
     # via
     #   boto3
     #   s3transfer
@@ -69,6 +69,8 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
+kaleido==0.2.1
+    # via -r requirements.in
 mypy-extensions==1.0.0
     # via black
 numpy==1.24.2
@@ -95,6 +97,8 @@ patsy==0.5.3
     # via statsmodels
 platformdirs==3.1.0
     # via black
+plotly==5.13.1
+    # via -r requirements.in
 pluggy==1.0.0
     # via pytest
 property-cached==1.6.4
@@ -142,6 +146,8 @@ starlette==0.25.0
     # via fastapi
 statsmodels==0.13.5
     # via arch
+tenacity==8.2.2
+    # via plotly
 tomli==2.0.1
     # via
     #   black
@@ -153,7 +159,7 @@ urllib3==1.26.14
     # via
     #   botocore
     #   requests
-uvicorn[standard]==0.20.0
+uvicorn[standard]==0.21.0
     # via -r requirements.in
 uvloop==0.17.0
     # via uvicorn

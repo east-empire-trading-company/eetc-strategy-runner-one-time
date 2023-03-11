@@ -4,8 +4,10 @@ boto3
 eetc-data-client
 eetc-utils
 fastapi
+kaleido
 numpy
 pandas
+plotly
 pytest
 pytest-cov
 python-telegram-bot
