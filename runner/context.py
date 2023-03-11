@@ -6,6 +6,7 @@ from eetc_data_client.client import EETCDataClient
 import settings
 from runner.strategy import StrategyBase
 from utils.email import EmailClient
+from utils.interactive_brokers import InteractiveBrokersClient
 from utils.telegram import EETCTelegramChannel
 from utils.vault import EETCVaultClient
 
@@ -21,6 +22,7 @@ class Context:
         self._data_client = EETCDataClient(api_key=settings.EETC_API_KEY)
         self._vault_client = EETCVaultClient()
         self._email_client = EmailClient()
+        self._ibkr_client = InteractiveBrokersClient()
 
     @property
     def email_client(self) -> EmailClient:
@@ -41,6 +43,10 @@ class Context:
     @property
     def telegram_channel(self) -> EETCTelegramChannel:
         return self._telegram_channel
+
+    @property
+    def ibkr_client(self) -> InteractiveBrokersClient:
+        return self._ibkr_client
 
     def add_strategy(self, strategy: Type[StrategyBase]):
         self._strategies.append(strategy(context=self))

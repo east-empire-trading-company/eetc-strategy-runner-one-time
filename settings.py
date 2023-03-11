@@ -12,6 +12,9 @@ AWS_REGION = "eu-central-1"
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
+IBKR_TWS_PORT = 7496
+IBKR_TWS_HOST = "127.0.0.1"
+
 try:
     from local_settings import *
 except ImportError:
