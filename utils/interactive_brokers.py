@@ -19,8 +19,8 @@ def run_message_loop(ib):
 
 class InteractiveBrokersClient:
     def __init__(self):
-        self._port = settings.IBKR_TWS_PORT
-        self._host = settings.IBKR_TWS_HOST
+        self._port = settings.IB_GATEWAY_PORT
+        self._host = settings.IB_GATEWAY_HOST
         self._client_id = int(time.time())
         self._ib = None  # set by self.connect_to_tws()
         self._msg_loop_thread = None  # set by self.connect_to_tws()

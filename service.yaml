@@ -39,6 +39,11 @@ spec:
             secretKeyRef:
               key: latest
               name: EETC_API_KEY
+        - name: EETC_VAULT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: EETC_VAULT_API_KEY
         - name: AWS_ACCESS_KEY
           valueFrom:
             secretKeyRef:
