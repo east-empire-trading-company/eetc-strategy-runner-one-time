@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import List, Type
 
@@ -23,6 +24,8 @@ class Context:
         self._vault_client = EETCVaultClient()
         self._email_client = EmailClient()
         self._ibkr_client = InteractiveBrokersClient()
+
+        self.shared_data = {}  # share data between strategies
 
     @property
     def email_client(self) -> EmailClient:
@@ -75,3 +78,4 @@ class Context:
         for strategy in self._strategies:
             logging.info(f"Executing strategy: {strategy.__class__}")
             await strategy.execute_async()
+            await asyncio.sleep(5)

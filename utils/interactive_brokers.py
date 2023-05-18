@@ -1,7 +1,11 @@
+import logging
 import threading
 import time
 from datetime import datetime
 from math import sqrt
+from typing import List
+
+import pandas as pd
 
 import settings
 from utils.ibkr.contracts import Option
@@ -19,8 +23,8 @@ def run_message_loop(ib):
 
 class InteractiveBrokersClient:
     def __init__(self):
-        self._port = settings.IBKR_TWS_PORT
-        self._host = settings.IBKR_TWS_HOST
+        self._port = settings.IB_GATEWAY_PORT
+        self._host = settings.IB_GATEWAY_HOST
         self._client_id = int(time.time())
         self._ib = None  # set by self.connect_to_tws()
         self._msg_loop_thread = None  # set by self.connect_to_tws()
@@ -89,7 +93,7 @@ class InteractiveBrokersClient:
 
             self._ib.reqMarketDataType(2)
 
-            option_price = self._ib.reqMktData(
+            option_price = self._ib.reqMktData_last_price(
                 int(time.time()),
                 details.contract,
                 "",
@@ -113,8 +117,105 @@ class InteractiveBrokersClient:
                 )
                 market_iv = iv / sqrt(252)
 
-                time.sleep(0.5)
+                time.sleep(1)
 
             return market_iv
+        finally:
+            self.disconnect_from_tws()
+
+    def get_net_gamma(
+        self,
+        symbol: str,
+        strike_prices: List[int],
+        expiration_dates: List[datetime],
+    ) -> pd.DataFrame:
+        try:
+            self.connect_to_tws()
+
+            df = pd.DataFrame()  # output
+
+            for expiration_date in expiration_dates:
+                expiration = expiration_date.strftime("%Y%m%d")
+
+                for strike_price in strike_prices:
+                    strike = int(strike_price)
+
+                    # call
+                    contract = Option(symbol, expiration, strike, "C", "SMART")
+                    details = self._ib.reqContractDetails(int(time.time()), contract)
+
+                    # call gamma
+                    self._ib.reqMarketDataType(2)
+                    greeks = self._ib.reqMktData_greeks(
+                        int(time.time()),
+                        details.contract,
+                        "",
+                        True,
+                        False,
+                        [],
+                    )
+                    call_gamma = greeks["gamma"]
+
+                    # call open-interest
+                    self._ib.reqMarketDataType(2)
+                    call_open_interest = self._ib.reqMktData_call_option_open_interest(
+                        int(time.time()),
+                        details.contract,
+                        "mdoff,101",
+                        False,
+                        False,
+                        [],
+                    )
+                    if call_open_interest is None:
+                        continue
+
+                    call_gex = call_gamma * call_open_interest * 100 * strike
+
+                    # put
+                    contract = Option(symbol, expiration, strike, "P", "SMART")
+                    details = self._ib.reqContractDetails(int(time.time()), contract)
+
+                    # put gamma
+                    self._ib.reqMarketDataType(2)
+                    greeks = self._ib.reqMktData_greeks(
+                        int(time.time()),
+                        details.contract,
+                        "",
+                        True,
+                        False,
+                        [],
+                    )
+                    put_gamma = greeks["gamma"]
+
+                    # put open-interest
+                    self._ib.reqMarketDataType(2)
+                    put_open_interest = self._ib.reqMktData_put_option_open_interest(
+                        int(time.time()),
+                        details.contract,
+                        "mdoff,101",
+                        False,
+                        False,
+                        [],
+                    )
+                    if put_open_interest is None or put_gamma is None:
+                        continue
+
+                    put_gex = put_gamma * put_open_interest * 100 * strike * -1
+
+                    data = {
+                        "expiration_date": expiration_date,
+                        "strike": strike,
+                        "net_gamma": round(call_gex + put_gex, 2),
+                        "call_gex": call_gex,  # positive number
+                        "put_gex": put_gex,  # negative number
+                    }
+                    print(data)
+                    logging.info(str(data))
+
+                    # df = df.append(data, ignore_index=True)
+                    df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
+                    time.sleep(1.5)
+
+            return df
         finally:
             self.disconnect_from_tws()
