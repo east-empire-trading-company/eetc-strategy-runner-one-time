@@ -20,4 +20,5 @@ class EETCTelegramChannel:
             chat_id=settings.TELEGRAM_CHANNEL_ID,
             photo=image,
             caption=caption,
+            write_timeout=120,
         )

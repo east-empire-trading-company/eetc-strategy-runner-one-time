@@ -5,6 +5,7 @@ eetc-data-client
 eetc-utils
 fastapi
 kaleido
+matplotlib
 numpy
 pandas
 plotly

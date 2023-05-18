@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from runner.strategy import OneTimeStrategy
 
@@ -19,6 +19,12 @@ class MarketImpliedVolatility(OneTimeStrategy):
         strike = df["close"].iloc[-1]  # latest price
         expiration = datetime.today()
 
+        today = datetime.today()
+        for exp_date in [today + timedelta(days=x) for x in range(3)]:
+            if 1 <= exp_date.isoweekday() <= 5:
+                expiration = exp_date
+                break  # only get the next earliest possible weekday
+
         iv = self.parent_context.ibkr_client.get_market_implied_volatility(
             symbol,
             strike,
@@ -27,7 +33,7 @@ class MarketImpliedVolatility(OneTimeStrategy):
 
         expiration = expiration.strftime("%d.%m.%Y")
 
-        message = f"Expected Market Implied Volatility {strike}C {expiration} Expo for {symbol}:\n{iv}"
+        message = f"Expected Market Implied Volatility {strike}C {expiration} Expo for {symbol}:\n{round(iv * 100, 2)}%"
         await self.parent_context.telegram_channel.send_message(message)
 
         move = round(strike * iv, 2)
@@ -39,3 +45,9 @@ class MarketImpliedVolatility(OneTimeStrategy):
 
         message = f"Expected Intraday SPY Range {expiration}:\n{low} - {high}"
         await self.parent_context.telegram_channel.send_message(message)
+
+        self.parent_context.shared_data["market_implied_volatility"] = {
+            "daily_range_low": low,
+            "daily_range_high": high,
+            "daily_move": move,
+        }
