@@ -13,4 +13,5 @@ pytest
 pytest-cov
 python-telegram-bot
 requests
+TA-Lib
 uvicorn[standard]

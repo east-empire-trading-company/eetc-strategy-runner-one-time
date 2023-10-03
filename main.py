@@ -5,6 +5,7 @@ from strategies.calculate_optimal_position_size import CalculateOptimalPositionS
 from strategies.market_implied_volatility import MarketImpliedVolatility
 from strategies.net_gamma import NetGamma
 from strategies.recession_indicators import RecessionIndicators
+from strategies.ta_screener import TAScreener
 
 app = FastAPI()
 
@@ -12,6 +13,15 @@ app = FastAPI()
 @app.get("/api/strategy/calculate_optimal_position_sizes")
 async def execute_calculate_optimal_position_sizes_strategy():
     context = Context(strategies=[CalculateOptimalPositionSize])
+
+    await context.execute_strategies_async()
+
+    return {"status": "OK"}
+
+
+@app.get("/api/strategy/ta_screener")
+async def execute_calculate_optimal_position_sizes_strategy():
+    context = Context(strategies=[TAScreener])
 
     await context.execute_strategies_async()
 

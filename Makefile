@@ -27,3 +27,7 @@ build_and_deploy_docker_image:
 deploy: build_and_deploy_docker_image
 	gcloud beta run services replace service.yaml --platform managed
 	gcloud beta run deploy eetc-strategy-runner-one-time-service --platform managed --port 8080 --image gcr.io/eetc-strategy-runner-one-time/eetc-strategy-runner-one-time-service --allow-unauthenticated
+
+
+roguetrader_pre_market_report:
+	curl http://127.0.0.1:8000/api/strategy/roguetrader_pre_market_report
