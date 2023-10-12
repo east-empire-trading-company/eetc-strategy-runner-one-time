@@ -2,11 +2,19 @@
 # https://hub.docker.com/_/python
 FROM python:3.10-slim-buster
 
+RUN apt-get update && apt-get install -y make gfortran libfreetype6-dev libhdf5-dev liblapack-dev libopenblas-dev libpng-dev
+
+ENV TA_PREFIX="/opt/ta-lib-core"
+ENV TA_LIBRARY_PATH="$TA_PREFIX/lib"
+ENV TA_INCLUDE_PATH="$TA_PREFIX/include"
+
 # Set the working directory
 WORKDIR /eetc-strategy-runner-one-time
 
 # Copy local code to the container image.
 COPY . .
+
+RUN cd talib_source/ && ./configure --prefix=$TA_PREFIX && make && make install && cd ..
 
 # Install dependencies
 RUN pip3 install -r requirements.txt
