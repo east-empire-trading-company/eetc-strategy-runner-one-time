@@ -54,21 +54,29 @@ class TAScreener(OneTimeStrategy):
             if ma_55_prev <= ma_55 and ma_21_prev <= ma_21:
                 moving_averages_rising = True
 
-            # TODO check if there's a favorable MA crossing in the past n days
+            # check if there was a "favorable" MA crossing in the past n days
+            price_data["21_ma_lt_55_ma"] = price_data["21_ma"].lt(price_data["55_ma"])
+            price_data["55_ma_lt_144_ma"] = price_data["55_ma"].lt(price_data["144_ma"])
 
             if ma_144 <= ma_55 <= ma_21 and price >= ma_55 and moving_averages_rising:
-                stocks_with_ideal_bullish_setup.append(
-                    {
-                        "Symbol": symbol,
-                        "Name": stock["name"],
-                        "Price": price,
-                        "144MA": ma_144,
-                        "55MA": ma_55,
-                        "21MA": ma_21,
-                        "Sector": stock["sector"],
-                    },
+                # presence of a bullish MA crossing in the last n days
+                bullish_ma_crossing_present = (
+                    True in price_data.tail(10)["21_ma_lt_55_ma"].values
+                    or True in price_data.tail(10)["55_ma_lt_144_ma"].values
                 )
-                continue
+                if bullish_ma_crossing_present:
+                    stocks_with_ideal_bullish_setup.append(
+                        {
+                            "Symbol": symbol,
+                            "Name": stock["name"],
+                            "Price": price,
+                            "144MA": ma_144,
+                            "55MA": ma_55,
+                            "21MA": ma_21,
+                            "Sector": stock["sector"],
+                        },
+                    )
+                    continue
 
             # ideal bearish setup is if the price is bellow all the MAs, with
             # all the MAs falling or flat, while 144 MA is above 51 MA, which is
@@ -77,21 +85,25 @@ class TAScreener(OneTimeStrategy):
             if ma_55_prev >= ma_55 and ma_21_prev >= ma_21:
                 moving_averages_falling = True
 
-            # TODO check if there's a favorable MA crossing in the past n days
-
+            # check if there's a favorable MA crossing in the past n days
             if ma_21 <= ma_55 <= ma_144 and price <= ma_55 and moving_averages_falling:
-                stocks_with_ideal_bearish_setup.append(
-                    {
-                        "Symbol": symbol,
-                        "Name": stock["name"],
-                        "Price": price,
-                        "144MA": ma_144,
-                        "55MA": ma_55,
-                        "21MA": ma_21,
-                        "Sector": stock["sector"],
-                    },
+                bearish_ma_crossing_present = (
+                    False in price_data.tail(10)["21_ma_lt_55_ma"].values
+                    or False in price_data.tail(10)["55_ma_lt_144_ma"].values
                 )
-                continue
+                if bearish_ma_crossing_present:
+                    stocks_with_ideal_bearish_setup.append(
+                        {
+                            "Symbol": symbol,
+                            "Name": stock["name"],
+                            "Price": price,
+                            "144MA": ma_144,
+                            "55MA": ma_55,
+                            "21MA": ma_21,
+                            "Sector": stock["sector"],
+                        },
+                    )
+                    continue
 
         if stocks_with_ideal_bullish_setup:
             df = pd.DataFrame.from_records(stocks_with_ideal_bullish_setup)
