@@ -4,6 +4,7 @@ boto3
 eetc-data-client
 eetc-utils
 fastapi
+graphviz
 kaleido
 matplotlib
 numpy
@@ -13,5 +14,6 @@ pytest
 pytest-cov
 python-telegram-bot
 requests
+scikit-learn
 TA-Lib
 uvicorn[standard]
