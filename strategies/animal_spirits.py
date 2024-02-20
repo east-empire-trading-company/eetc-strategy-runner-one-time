@@ -8,8 +8,10 @@ import pandas as pd
 import talib
 from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 from runner.strategy import OneTimeStrategy
 
@@ -68,6 +70,8 @@ class AnimalSpirits(OneTimeStrategy):
         df = self._get_sp500_bull_bear_dataset()
 
         # calculate features
+        # TODO split training-test set before doing anything (data leakage)
+        #   when doing this, make sure to use bias correction
         df = self._calculate_trend_momo_features(df)
         df = self._calculate_interest_rate_features(df)
         df = self._calculate_gdp_growth_features(df)
@@ -123,6 +127,8 @@ class AnimalSpirits(OneTimeStrategy):
             df,
             label_encoder_per_col_map,
         ) = self._transform_categorical_columns_to_numerical(df, columns_to_transform)
+
+        self._check_multicollinearity(df)
 
         return df, label_encoder_per_col_map
 
@@ -572,8 +578,8 @@ class AnimalSpirits(OneTimeStrategy):
         x_train = df.drop(["cycle", "date"], axis=1)  # features
         y_train = df["cycle"]  # prediction column
         x_pred = x_train.iloc[-1:]  # prediction dataset (last row only)
-        x_train = x_train.iloc[:-1]  # drop last (prediction) row
-        y_train = y_train.iloc[:-1]  # drop last (prediction) row
+        x_train = x_train.iloc[:1857]  # drop last (prediction) row
+        y_train = y_train.iloc[:1857]  # drop last (prediction) row
 
         # parameters
         n_estimators = 256  # above 128 trees, the RoI is negligible
@@ -697,3 +703,19 @@ class AnimalSpirits(OneTimeStrategy):
             },
             inplace=False,
         )
+    
+    def _check_multicollinearity(self, df: pd.DataFrame):
+        # independent variables DataFrame
+        x = df.drop(["date", "cycle"], axis=1)
+
+        # VIF DataFrame
+        vif_data = pd.DataFrame()
+        vif_data["feature"] = x.columns
+
+        # calculate VIF for each feature
+        vif_data["vif"] = [
+            variance_inflation_factor(x.values, i)
+            for i in range(len(x.columns))
+        ]
+
+        print(vif_data)

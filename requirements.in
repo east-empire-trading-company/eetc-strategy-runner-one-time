@@ -15,5 +15,6 @@ pytest-cov
 python-telegram-bot
 requests
 scikit-learn
+statsmodels
 TA-Lib
 uvicorn[standard]
