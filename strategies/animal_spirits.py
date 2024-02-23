@@ -8,7 +8,6 @@ import pandas as pd
 import talib
 from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -40,7 +39,7 @@ class AnimalSpirits(OneTimeStrategy):
 
         df, prediction = self._train_and_execute_model(df, label_encoder_per_col_map)
         # uncomment to test the model
-        # self._train_and_test_model(df, label_encoder_per_col_map)
+        # df, train_acc, test_acc = self._train_and_test_model(df, label_encoder_per_col_map)
 
         # rename columns for presentation purposes
         df = self._rename_columns(df)
@@ -57,7 +56,7 @@ class AnimalSpirits(OneTimeStrategy):
         )
         # TODO Generate a Telegram text message containing all the data that was
         #   used to make the prediction.
-        await self.parent_context.telegram_channel.send_message(subject)
+        # await self.parent_context.telegram_channel.send_message(subject)
 
     def _prepare_dataset(self) -> Tuple[pd.DataFrame, Dict]:
         """
@@ -93,16 +92,16 @@ class AnimalSpirits(OneTimeStrategy):
             "gdp_growth_vol",
             "cpi_roc",
             "cpi_vol",
-            "cpi_lvl",
+            # "cpi_lvl",
             "sahm_rule",
             "ism_pmi",
             "ig_regime",
             "pce_roc",
             "pce_vol",
             "pdi_roc",
-            "pdi_vol",
+            # "pdi_vol",
             "pdi",
-            "pce",
+            # "pce",
             "corporate_profits",
             "corporate_profits_vol",
         ]
@@ -117,10 +116,10 @@ class AnimalSpirits(OneTimeStrategy):
             "interest_rates_direction",
             "gdp_growth_vol",
             "cpi_vol",
-            "cpi_lvl",
+            # "cpi_lvl",
             "ig_regime",
             "pce_vol",
-            "pdi_vol",
+            # "pdi_vol",
             "corporate_profits_vol",
         ]
         (
@@ -128,6 +127,7 @@ class AnimalSpirits(OneTimeStrategy):
             label_encoder_per_col_map,
         ) = self._transform_categorical_columns_to_numerical(df, columns_to_transform)
 
+        # TODO reduce multicollinearity as much as possible
         self._check_multicollinearity(df)
 
         return df, label_encoder_per_col_map
@@ -622,16 +622,16 @@ class AnimalSpirits(OneTimeStrategy):
         # prepare train and test input data
         x = df.drop(["cycle"], axis=1)  # features
         y = df["cycle"]  # prediction column
-        x_train, x_test, y_train, y_test = train_test_split(
+        x_train, x_test_with_date, y_train, y_test = train_test_split(
             x,
             y,
-            test_size=0.25,  # roughly from 2007 onward
+            test_size=0.15,  # roughly from 2014 onward
             random_state=None,
             shuffle=False,
             stratify=None,
         )
         x_train = x_train.drop(["date"], axis=1)
-        x_test = x_test.drop(["date"], axis=1)
+        x_test = x_test_with_date.drop(["date"], axis=1)
 
         # parameters
         n_estimators = 256  # above 128 trees, the RoI is negligible
@@ -649,6 +649,18 @@ class AnimalSpirits(OneTimeStrategy):
         # test the model
         train_acc = model.score(x_train, y_train)
         test_acc = model.score(x_test, y_test)
+
+        # make the prediction
+        prediction = model.predict(x_test)
+
+        # add the prediction back to the original dataset
+        x_test_with_date["prediction"] = prediction
+        x_test_with_date["cycle"] = y_test
+
+        # undo the discretionary column transformations
+        for col, label_encoder in label_encoder_per_col_map.items():
+            x_test_with_date[col] = label_encoder.inverse_transform(x_test_with_date[col])
+
         print(
             f"Accuracy on training set for n_estimators={n_estimators} max_features={max_features}: {train_acc}"
         )
@@ -656,6 +668,8 @@ class AnimalSpirits(OneTimeStrategy):
             f"Accuracy on test set for n_estimators={n_estimators} max_features={max_features}: {test_acc}"
         )
         print(f"Feature importances: {model.feature_importances_}")
+
+        return x_test_with_date, test_acc, train_acc
 
         def _plot_feature_importances(tree):
             n_features = x_train.shape[1]
