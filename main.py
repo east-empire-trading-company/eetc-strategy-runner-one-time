@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from runner.context import Context
 from strategies.calculate_optimal_position_size import CalculateOptimalPositionSize
+from strategies.mark_minervini import MarkMinervini
 from strategies.market_implied_volatility import MarketImpliedVolatility
 from strategies.animal_spirits import AnimalSpirits
 from strategies.net_gamma import NetGamma
@@ -60,6 +61,15 @@ async def execute_roguetrader_pre_market_report_strategies():
 @app.get("/api/strategy/animal_spirits")
 async def execute_animal_spirits_strategy():
     context = Context(strategies=[AnimalSpirits])
+
+    await context.execute_strategies_async()
+
+    return {"status": "OK"}
+
+
+@app.get("/api/strategy/mark_minervini")
+async def execute_mark_minervini_strategy():
+    context = Context(strategies=[MarkMinervini])
 
     await context.execute_strategies_async()
 
