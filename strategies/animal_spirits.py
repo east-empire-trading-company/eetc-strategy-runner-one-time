@@ -659,7 +659,9 @@ class AnimalSpirits(OneTimeStrategy):
 
         # undo the discretionary column transformations
         for col, label_encoder in label_encoder_per_col_map.items():
-            x_test_with_date[col] = label_encoder.inverse_transform(x_test_with_date[col])
+            x_test_with_date[col] = label_encoder.inverse_transform(
+                x_test_with_date[col]
+            )
 
         print(
             f"Accuracy on training set for n_estimators={n_estimators} max_features={max_features}: {train_acc}"
@@ -717,7 +719,7 @@ class AnimalSpirits(OneTimeStrategy):
             },
             inplace=False,
         )
-    
+
     def _check_multicollinearity(self, df: pd.DataFrame):
         # independent variables DataFrame
         x = df.drop(["date", "cycle"], axis=1)
@@ -728,8 +730,7 @@ class AnimalSpirits(OneTimeStrategy):
 
         # calculate VIF for each feature
         vif_data["vif"] = [
-            variance_inflation_factor(x.values, i)
-            for i in range(len(x.columns))
+            variance_inflation_factor(x.values, i) for i in range(len(x.columns))
         ]
 
         print(vif_data)

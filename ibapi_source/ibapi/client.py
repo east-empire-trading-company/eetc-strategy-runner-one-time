@@ -3,7 +3,6 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-
 """
 The main class to use from API user's point of view.
 It takes care of almost everything:
@@ -1779,9 +1778,7 @@ class EClient(object):
                     make_field_handle_empty(
                         UNSET_INTEGER
                         if order.usePriceMgmtAlgo == None
-                        else 1
-                        if order.usePriceMgmtAlgo
-                        else 0
+                        else 1 if order.usePriceMgmtAlgo else 0
                     )
                 )
 

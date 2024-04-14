@@ -89,10 +89,14 @@ class MarkMinervini(OneTimeStrategy):
         df["50_ma"] = talib.SMA(df["close"], 50)
         df["200_ma_21_ma"] = talib.SMA(df["close"], 21)
         df["200_ma_84_ma"] = talib.SMA(df["close"], 84)
-        df['52_week_high'] = df["close"].rolling(window=252, center=False).max()
-        df['52_week_low'] = df['close'].rolling(window=252, center=False).min()
-        df["200_ma_trend"] = np.where(df["200_ma_21_ma"] > df["200_ma_84_ma"], "Up", "Down")
-        df["chaikin_oscillator"] = talib.ADOSC(df["high"], df["low"], df["close"], df["volume"])
+        df["52_week_high"] = df["close"].rolling(window=252, center=False).max()
+        df["52_week_low"] = df["close"].rolling(window=252, center=False).min()
+        df["200_ma_trend"] = np.where(
+            df["200_ma_21_ma"] > df["200_ma_84_ma"], "Up", "Down"
+        )
+        df["chaikin_oscillator"] = talib.ADOSC(
+            df["high"], df["low"], df["close"], df["volume"]
+        )
 
         def satisfies_trend_model(row):
             if not (row["close"] > max([row["200_ma"], row["150_ma"], row["50_ma"]])):
