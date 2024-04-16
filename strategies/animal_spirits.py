@@ -269,7 +269,7 @@ class AnimalSpirits(OneTimeStrategy):
         """
 
         df = df.loc[:, columns_to_keep]
-        df = df.round(2)
+        df = df.round(3)
         df = df.replace([np.inf, -np.inf], 0, inplace=False)
         df = df.dropna()
         df = df.drop_duplicates(subset=df.columns.difference(["date"]), keep="first")
