@@ -14,7 +14,7 @@ class CalculateOptimalPositionSize(OneTimeStrategy):
         to be awaited.
         """
 
-        default_position_size = 10000
+        default_position_size = 2000
 
         portfolio = self.parent_context.vault_client.get_current_positions()
 
