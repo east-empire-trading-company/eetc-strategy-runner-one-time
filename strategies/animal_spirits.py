@@ -38,9 +38,9 @@ class AnimalSpirits(OneTimeStrategy):
         df, label_encoder_per_col_map = self._prepare_dataset()
 
         # comment to test the model
-        # df, prediction = self._train_and_execute_model(df, label_encoder_per_col_map)
+        df, prediction = self._train_and_execute_model(df, label_encoder_per_col_map)
         # uncomment to test the model
-        df, train_acc, test_acc = self._train_and_test_model(df, label_encoder_per_col_map)
+        # df, train_acc, test_acc = self._train_and_test_model(df, label_encoder_per_col_map)
 
         # rename columns for presentation purposes
         df = self._rename_columns(df)
