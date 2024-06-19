@@ -37,9 +37,10 @@ class AnimalSpirits(OneTimeStrategy):
 
         df, label_encoder_per_col_map = self._prepare_dataset()
 
-        df, prediction = self._train_and_execute_model(df, label_encoder_per_col_map)
+        # comment to test the model
+        # df, prediction = self._train_and_execute_model(df, label_encoder_per_col_map)
         # uncomment to test the model
-        # df, train_acc, test_acc = self._train_and_test_model(df, label_encoder_per_col_map)
+        df, train_acc, test_acc = self._train_and_test_model(df, label_encoder_per_col_map)
 
         # rename columns for presentation purposes
         df = self._rename_columns(df)
@@ -243,16 +244,23 @@ class AnimalSpirits(OneTimeStrategy):
         self,
         main_df: pd.DataFrame,
         feature_df: pd.DataFrame,
+        shift: bool = False,
+        shift_by: int = 1
     ) -> pd.DataFrame:
         """
         Left join feature DataFrame to the main DataFrame based on the "date" column.
         :param main_df: LEFT DataFrame in the JOIN.
         :param feature_df: RIGHT DataFrame in the JOIN.
+        :param shift: Indicates whether to shift feature_df forward/backward before JOIN.
+        :param shift_by: Number of periods/rows we want to shift feature_df by.
         :return: Main DataFrame with the new feature columns.
         """
 
         all_dates = self._get_missing_dates_for_joining(main_df)
         feature_df = feature_df.set_index("date")
+        if shift:
+            feature_df = feature_df.shift(shift_by, axis=0)
+            feature_df = feature_df.dropna()
         feature_df = feature_df.reindex(all_dates, method="ffill")
         feature_df = feature_df.reset_index().rename(columns={"index": "date"})
 
@@ -340,7 +348,7 @@ class AnimalSpirits(OneTimeStrategy):
             lambda val: "Low" if val <= gdp_growth_std else "High",
         )
 
-        df = self._join_feature_df_with_main_df(df, df_gdp)
+        df = self._join_feature_df_with_main_df(df, df_gdp, shift=True)
 
         return df
 
@@ -361,7 +369,7 @@ class AnimalSpirits(OneTimeStrategy):
             logging.info(f"Failed to fetch indicator data for {indicator}")
             raise e
 
-        df = self._join_feature_df_with_main_df(df, df_sahm)
+        df = self._join_feature_df_with_main_df(df, df_sahm, shift=True)
 
         return df
 
@@ -382,7 +390,7 @@ class AnimalSpirits(OneTimeStrategy):
             logging.info(f"Failed to fetch indicator data for {indicator}")
             raise e
 
-        df = self._join_feature_df_with_main_df(df, df_pmi)
+        df = self._join_feature_df_with_main_df(df, df_pmi, shift=True)
 
         return df
 
@@ -426,7 +434,7 @@ class AnimalSpirits(OneTimeStrategy):
         df_cpi["cpi_std_3m"] = df_cpi["cpi"].rolling(3).std().fillna(0)
         df_cpi["cpi_vol"] = df_cpi.apply(_get_cpi_vol, axis=1)
         df_cpi["cpi_lvl"] = df_cpi.apply(_get_cpi_lvl, axis=1)
-        df = self._join_feature_df_with_main_df(df, df_cpi)
+        df = self._join_feature_df_with_main_df(df, df_cpi, shift=True)
 
         # calculate IG (I=Inflation, G=Growth) Regime
         def _get_ig_regime(row):
@@ -479,7 +487,7 @@ class AnimalSpirits(OneTimeStrategy):
         df_pce["pce_std_3m"] = df_pce["pce"].rolling(3).std().fillna(0)
         df_pce["pce_vol"] = df_pce.apply(get_pce_vol, axis=1)
 
-        df = self._join_feature_df_with_main_df(df, df_pce)
+        df = self._join_feature_df_with_main_df(df, df_pce, shift=True)
 
         return df
 
@@ -533,7 +541,7 @@ class AnimalSpirits(OneTimeStrategy):
             lambda val: "Low" if val <= corporate_profits_std else "High",
         )
 
-        df = self._join_feature_df_with_main_df(df, df_cp)
+        df = self._join_feature_df_with_main_df(df, df_cp, shift=True)
 
         # TODO feature to see if personal interest/debt payments are affecting
         #  personal consumption (YoY increase leads to YoY increase), overlaid
